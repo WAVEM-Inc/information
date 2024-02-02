@@ -1,5 +1,0 @@
-string job_group
-string job_kind
-string job_plan_id
-string job_group_id
-string job_order_id

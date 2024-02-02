@@ -1,5 +1,0 @@
-bool check # 1 regist 0 look_up
-uint8 type # 1 AMR 2 AGV 0 NONE
----
-uint8 result # check 1 regist --> 1 success 0 fail , check 0 look_up --> 1 AMR 2 AGV 0 NONE(CONTROL) 
-string description 
