@@ -1,0 +1,45 @@
+cmake_minimum_required(VERSION 3.5)
+project(battery_state_publisher)
+
+if(NOT CMAKE_C_STANDARD)
+  set(CMAKE_C_STANDARD 99)
+endif()
+
+if(NOT CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD 14)
+endif()
+
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
+
+include_directories(
+  include
+  include/${PROJECT_NAME}
+  /usr/local/include
+)
+
+find_package(ament_cmake REQUIRED)
+find_package(rcl REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(std_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(actionlib_msgs REQUIRED)
+find_package(tf2_msgs REQUIRED)
+find_package(can_msgs REQUIRED)
+
+add_executable(battery_state_publisher_node
+  src/main.cpp
+  src/can/lib.cpp src/can/can_adaptor.cpp src/can/can_send.cpp src/can/data_relayer.cpp src/can/can_dump.cpp src/can/can_manager.cpp
+)
+ament_target_dependencies(battery_state_publisher_node rcl rclcpp std_msgs sensor_msgs tf2_msgs can_msgs)
+
+install(TARGETS
+  battery_state_publisher_node
+  DESTINATION lib/${PROJECT_NAME}
+)
+install(DIRECTORY
+	launch
+	DESTINATION share/${PROJECT_NAME}
+)
+ament_package()
