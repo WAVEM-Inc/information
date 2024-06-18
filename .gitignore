@@ -1,4 +1,9 @@
-build
-install
-log
+build/
+install/
+log/
 .vscode
+cmake-build-debug/
+cmake-build-remote-host-cmake/
+.idea/
+.swp
+.pyc
