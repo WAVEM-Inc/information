@@ -18,7 +18,7 @@ class BatteryStateSaver : public rclcpp::Node
 {
 public:
     BatteryStateSaver()
-            : Node("battery_state_saver"), dir_path_("/home/ubuntu/RobotData/log/")
+            : Node("battery_state_saver"), dir_path_("/home/nuc-bt/RobotData/log/")
     {
         this->declare_parameter<std::string>("dir_path", dir_path_);
         this->get_parameter("dir_path", dir_path_);
@@ -45,7 +45,7 @@ public:
                 "/sensor/battery/state", 10, std::bind(&BatteryStateSaver::battery_state_callback, this, std::placeholders::_1), subscriber_options);
 
         timer_ = this->create_wall_timer(
-                15min, std::bind(&BatteryStateSaver::save_battery_state_to_file, this));
+                5min, std::bind(&BatteryStateSaver::save_battery_state_to_file, this));
 
         // Initialize the file path with the current time
         file_path_ = dir_path_ + "battery_state_" + get_current_time_str() + ".txt";
