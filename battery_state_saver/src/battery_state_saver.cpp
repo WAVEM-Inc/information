@@ -109,7 +109,7 @@ private:
                 file << "Time: " << get_current_time_str() << "\n"
                      << "Percentage: " << last_battery_state_->voltage << "\n"
                      << "Voltage: " << last_battery_state_->percentage << "\n"
-                     << "Odom" <<last_vcu_odom_->odom_data<<"\n\n";
+                     << "Odom: " <<last_vcu_odom_->odom_data<<"\n\n";
                 file.close();
             }
             else
