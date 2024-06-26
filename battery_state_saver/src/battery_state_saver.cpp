@@ -11,6 +11,7 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/battery_state.hpp"
+#include "can_msgs/msg/vcu_vehicle_odometer_status.hpp"
 
 using namespace std::chrono_literals;
 
@@ -38,11 +39,16 @@ public:
         // Create options for subscriber and timer
         auto subscriber_options = rclcpp::SubscriptionOptions();
         subscriber_options.callback_group = callback_group_subscriber_;
-
-
+        auto subscriber_vcu_odom_options = rclcpp::SubscriptionOptions();
+        subscriber_vcu_odom_options.callback_group = callback_group_odom_subscriber_;
 
         battery_state_sub_ = this->create_subscription<sensor_msgs::msg::BatteryState>(
                 "/sensor/battery/state", 10, std::bind(&BatteryStateSaver::battery_state_callback, this, std::placeholders::_1), subscriber_options);
+
+        vcu_odom_sub_ = this->create_subscription<can_msgs::msg::VcuVehicleOdometerStatus>("/drive/can/vcu/vehicle_odometer_status",
+                                                                                           rclcpp::QoS(rclcpp::SystemDefaultsQoS()),
+                                                                                           std::bind(&BatteryStateSaver::vcu_odom_callback, this, std::placeholders::_1),
+                                                                                           subscriber_vcu_odom_options);
 
         timer_ = this->create_wall_timer(
                 5min, std::bind(&BatteryStateSaver::save_battery_state_to_file, this));
@@ -89,7 +95,9 @@ private:
         RCLCPP_INFO(this->get_logger(), "Log Load");
         last_battery_state_ = msg;
     }
-
+    void vcu_odom_callback(const can_msgs::msg::VcuVehicleOdometerStatus::SharedPtr msg){
+        last_vcu_odom_ = msg;
+    }
     void save_battery_state_to_file()
     {
         RCLCPP_INFO(this->get_logger(), "Log Save");
@@ -99,8 +107,9 @@ private:
             if (file.is_open())
             {
                 file << "Time: " << get_current_time_str() << "\n"
-                     << "Voltage: " << last_battery_state_->voltage << "\n"
-                     << "Percentage: " << last_battery_state_->percentage << "\n\n";
+                     << "Percentage: " << last_battery_state_->voltage << "\n"
+                     << "Voltage: " << last_battery_state_->percentage << "\n"
+                     << "Odom" <<last_vcu_odom_->odom_data<<"\n\n";
                 file.close();
             }
             else
@@ -111,11 +120,14 @@ private:
     }
 
     rclcpp::Subscription<sensor_msgs::msg::BatteryState>::SharedPtr battery_state_sub_;
+    rclcpp::Subscription<can_msgs::msg::VcuVehicleOdometerStatus>::SharedPtr vcu_odom_sub_;
     rclcpp::TimerBase::SharedPtr timer_;
     sensor_msgs::msg::BatteryState::SharedPtr last_battery_state_;
+    can_msgs::msg::VcuVehicleOdometerStatus::SharedPtr last_vcu_odom_;
     std::string dir_path_;
     std::string file_path_;
     rclcpp::CallbackGroup::SharedPtr callback_group_subscriber_;
+    rclcpp::CallbackGroup::SharedPtr callback_group_odom_subscriber_;
     rclcpp::CallbackGroup::SharedPtr callback_group_timer_;
 };
 

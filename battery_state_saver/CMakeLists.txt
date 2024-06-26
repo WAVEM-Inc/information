@@ -9,9 +9,10 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(sensor_msgs REQUIRED)
+find_package(can_msgs REQUIRED)
 
 add_executable(battery_state_saver src/battery_state_saver.cpp)
-ament_target_dependencies(battery_state_saver rclcpp sensor_msgs)
+ament_target_dependencies(battery_state_saver rclcpp sensor_msgs can_msgs)
 
 install(TARGETS
         battery_state_saver
